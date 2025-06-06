@@ -11,6 +11,7 @@ body {
   display: flex;
   flex-direction: column;
   font-family: sans-serif;
+  background: white;
 }
 header {
   background: #333;
@@ -28,14 +29,23 @@ header button {
   margin-right: 0.5rem;
   padding: 0.3rem 0.6rem;
 }
-textarea {
+#editor {
   flex: 1;
   width: 100%;
   padding: 1rem;
   box-sizing: border-box;
   font-size: 1rem;
   line-height: 1.5;
-  resize: none;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  white-space: pre-wrap;
+  overflow: auto;
+  outline: none;
+}
+
+#editor:empty::before {
+  content: attr(data-placeholder);
+  color: #aaa;
 }
 </style>
 </head>
@@ -46,7 +56,7 @@ textarea {
   <button id="load">読み込み</button>
   <button id="export">ダウンロード</button>
 </header>
-<textarea id="editor" placeholder="本文を入力してください..."></textarea>
+<div id="editor" contenteditable="true" data-placeholder="本文を入力してください..."></div>
 <script>
 const titleInput = document.getElementById('title');
 const editor = document.getElementById('editor');
@@ -56,19 +66,19 @@ const exportBtn = document.getElementById('export');
 
 saveBtn.addEventListener('click', () => {
   localStorage.setItem('novel_title', titleInput.value);
-  localStorage.setItem('novel_text', editor.value);
+  localStorage.setItem('novel_text', editor.innerText);
   alert('保存しました');
 });
 
 loadBtn.addEventListener('click', () => {
   titleInput.value = localStorage.getItem('novel_title') || '';
-  editor.value = localStorage.getItem('novel_text') || '';
+  editor.innerText = localStorage.getItem('novel_text') || '';
   alert('読み込みました');
 });
 
 exportBtn.addEventListener('click', () => {
   const title = titleInput.value || 'novel';
-  const blob = new Blob([editor.value], {type: 'text/plain'});
+  const blob = new Blob([editor.innerText], {type: 'text/plain'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -79,7 +89,7 @@ exportBtn.addEventListener('click', () => {
 
 window.addEventListener('load', () => {
   titleInput.value = localStorage.getItem('novel_title') || '';
-  editor.value = localStorage.getItem('novel_text') || '';
+  editor.innerText = localStorage.getItem('novel_text') || '';
 });
 </script>
 </body>
